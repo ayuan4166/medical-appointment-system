@@ -44,10 +44,10 @@
 ![管理员后台](images/admin.png)
 
 ## 运行环境
-- JDK 1.8+
-- MySQL 5.7 / 8.0
-- Maven 3.6+
-- IDEA / Eclipse
+- Java 17
+- MySQL 8.0
+- Spring boot 3.5.10
+- IDEA 
 
 ## 部署运行步骤
 1. 创建数据库 `medical` 并执行SQL脚本
