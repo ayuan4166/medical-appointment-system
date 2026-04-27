@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗预约系统 - 登录</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=20260413">
+    <!-- 登录页背景：内联保证不被 Tailwind 注入样式覆盖；勿删 -->
+    <style id="login-page-bg">
+        html { height: 100%; }
+        body.auth-page {
+            margin: 0 !important;
+            min-height: 100vh !important;
+            color: #0f172a;
+            background-color: #0f172a !important;
+            background-image:
+                radial-gradient(ellipse 110% 70% at 15% 20%, rgba(56, 189, 248, 0.55), transparent 55%),
+                radial-gradient(ellipse 90% 60% at 95% 75%, rgba(45, 212, 191, 0.4), transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.25), transparent 45%),
+                linear-gradient(135deg, #1e1b4b 0%, #134e4a 38%, #0e7490 72%, #164e63 100%) !important;
+            background-attachment: fixed !important;
+            background-size: cover !important;
+        }
+        .auth-hero-bg {
+            z-index: 0;
+            background: linear-gradient(105deg, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.08) 55%, transparent 100%) !important;
+        }
+        .auth-hero-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.25;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .auth-main {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.18) 100%) !important;
+            backdrop-filter: blur(20px) saturate(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.2);
+        }
+        .auth-hero .relative.z-10 {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+        }
+    </style>
+</head>
+<body class="auth-page min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+
+    <!-- 左侧品牌区 -->
+    <aside class="auth-hero relative lg:w-[46%] min-h-[220px] lg:min-h-screen flex flex-col justify-between p-8 lg:p-12 text-white overflow-hidden">
+        <div class="auth-hero-bg absolute inset-0"></div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center border border-white/20 shadow-lg">
+                    <i class="fa-solid fa-heart-pulse text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.2em] text-white/70">Smart Hospital</p>
+                    <p class="text-xl font-semibold tracking-tight">医疗预约系统</p>
+                </div>
+            </div>
+            <h2 class="text-3xl lg:text-4xl font-bold leading-tight max-w-md">
+                预约诊疗，<br><span class="text-cyan-200">少排队、更省心</span>
+            </h2>
+            <p class="mt-4 text-white/85 text-sm lg:text-base max-w-sm leading-relaxed">
+                在线选择科室与医生，随时查看预约状态。患者可自助注册，医护与管理员账号由院内统一开通。
+            </p>
+        </div>
+        <ul class="relative z-10 hidden lg:grid gap-3 text-sm text-white/90">
+            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-300"></i> 分时预约，减少候诊时间</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-300"></i> 记录集中管理，状态一目了然</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-300"></i> 多端访问，操作简单</li>
+        </ul>
+    </aside>
+
+    <!-- 右侧表单 -->
+    <main class="auth-main flex-1 flex items-center justify-center p-6 lg:p-12 min-h-[50vh] lg:min-h-screen bg-transparent">
+        <div class="auth-card w-full max-w-md p-8 lg:p-10 rounded-3xl border border-white/60">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-800 tracking-tight">欢迎回来</h1>
+                <p class="text-slate-500 text-sm mt-2">登录或注册患者账号以使用预约服务</p>
+            </div>
+
+            <!-- 登录 / 注册 切换 -->
+            <div class="flex p-1 mb-8 bg-slate-100 rounded-xl">
+                <button type="button" id="tabLogin" onclick="showAuthPanel('login')"
+                    class="auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-600 shadow-sm">
+                    登录
+                </button>
+                <button type="button" id="tabRegister" onclick="showAuthPanel('register')"
+                    class="auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-800">
+                    注册患者
+                </button>
+            </div>
+
+            <!-- 登录表单 -->
+            <div id="panelLogin">
+                <form onsubmit="handleLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">用户名</label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="username" required autocomplete="username"
+                                class="auth-input block w-full pl-11 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-shadow"
+                                placeholder="请输入用户名">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">密码</label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" id="password" required autocomplete="current-password"
+                                class="auth-input block w-full pl-11 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-shadow"
+                                placeholder="请输入密码">
+                        </div>
+                    </div>
+                    <div id="errorMsg" class="text-red-500 text-sm hidden text-center bg-red-50 py-2 rounded-lg"></div>
+                    <button type="submit" id="loginBtn"
+                        class="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg shadow-blue-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        <span>立即登录</span>
+                        <i class="fa-solid fa-arrow-right text-xs opacity-90"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 注册表单 -->
+            <div id="panelRegister" class="hidden">
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">姓名 <span class="text-red-500">*</span></label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-id-card"></i></span>
+                            <input type="text" id="regName" required
+                                class="auth-input block w-full pl-11 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="真实姓名">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">用户名 <span class="text-red-500">*</span></label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="regUsername" required autocomplete="username"
+                                class="auth-input block w-full pl-11 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="用于登录，不可重复">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">密码 <span class="text-red-500">*</span></label>
+                            <input type="password" id="regPassword" required autocomplete="new-password"
+                                class="auth-input block w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="不少于 6 位">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">确认密码 <span class="text-red-500">*</span></label>
+                            <input type="password" id="regPassword2" required autocomplete="new-password"
+                                class="auth-input block w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="再次输入">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">注册身份</label>
+                        <input type="hidden" id="regRole" value="USER">
+                        <div class="flex flex-wrap gap-2" id="rolePills">
+                            <button type="button" data-role="USER" class="role-pill role-pill-active px-4 py-2 rounded-lg text-sm font-medium border transition-all">
+                                <i class="fa-solid fa-user-injured mr-1.5"></i>患者
+                            </button>
+                            <button type="button" data-role="DOCTOR" class="role-pill px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100 transition-all">
+                                <i class="fa-solid fa-user-doctor mr-1.5"></i>医生
+                            </button>
+                            <button type="button" data-role="ADMIN" class="role-pill px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100 transition-all">
+                                <i class="fa-solid fa-user-shield mr-1.5"></i>管理员
+                            </button>
+                        </div>
+                        <p id="roleHint" class="text-xs text-slate-500 mt-2 hidden"></p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">手机</label>
+                            <input type="tel" id="regPhone"
+                                class="auth-input block w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="选填">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">邮箱</label>
+                            <input type="email" id="regEmail"
+                                class="auth-input block w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm"
+                                placeholder="选填">
+                        </div>
+                    </div>
+                    <div id="regErrorMsg" class="text-red-500 text-sm hidden text-center bg-red-50 py-2 rounded-lg"></div>
+                    <div id="regOkMsg" class="text-emerald-600 text-sm hidden text-center bg-emerald-50 py-2 rounded-lg"></div>
+                    <button type="submit" id="registerBtn"
+                        class="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>创建患者账号</span>
+                    </button>
+                    <p class="text-xs text-center text-slate-400 leading-relaxed">
+                        医生与管理员账号不向公网开放注册，需由系统管理员在后台开通。
+                    </p>
+                </form>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                <p class="text-xs text-slate-400">© 2026 医疗预约系统</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="common.js"></script>
+    <script>
+        function showAuthPanel(which) {
+            const loginPanel = document.getElementById("panelLogin");
+            const regPanel = document.getElementById("panelRegister");
+            const tabLogin = document.getElementById("tabLogin");
+            const tabRegister = document.getElementById("tabRegister");
+            const err = document.getElementById("errorMsg");
+            err.classList.add("hidden");
+
+            if (which === "login") {
+                loginPanel.classList.remove("hidden");
+                regPanel.classList.add("hidden");
+                tabLogin.className = "auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-blue-600 shadow-sm";
+                tabRegister.className = "auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-800";
+            } else {
+                loginPanel.classList.add("hidden");
+                regPanel.classList.remove("hidden");
+                tabRegister.className = "auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-emerald-600 shadow-sm";
+                tabLogin.className = "auth-tab flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-slate-800";
+            }
+        }
+
+        document.querySelectorAll("#rolePills .role-pill").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const role = btn.getAttribute("data-role");
+                const hidden = document.getElementById("regRole");
+                const hint = document.getElementById("roleHint");
+
+                document.querySelectorAll("#rolePills .role-pill").forEach(b => {
+                    b.classList.remove("role-pill-active", "border-amber-300", "text-amber-800", "bg-amber-50");
+                    b.classList.add("border-slate-200", "text-slate-500", "bg-slate-50");
+                });
+
+                if (role === "USER") {
+                    btn.classList.remove("border-slate-200", "text-slate-500", "bg-slate-50");
+                    btn.classList.add("role-pill-active");
+                    hidden.value = "USER";
+                    hint.classList.add("hidden");
+                    hint.textContent = "";
+                } else {
+                    btn.classList.remove("border-slate-200", "text-slate-500", "bg-slate-50");
+                    btn.classList.add("border-amber-300", "text-amber-800", "bg-amber-50");
+                    hidden.value = role;
+                    hint.textContent = "权限不足：公开注册仅限患者账号。医生与管理员请由院内管理员在后台创建。";
+                    hint.classList.remove("hidden");
+                }
+            });
+        });
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("errorMsg");
+            const loginBtn = document.getElementById("loginBtn");
+
+            errorMsg.classList.add("hidden");
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i><span>登录中...</span>';
+
+            try {
+                const user = await common.fetch("/api/users/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                localStorage.setItem("user", JSON.stringify(user));
+
+                if (user.role === "ADMIN") {
+                    window.location.href = "admin.html";
+                } else if (user.role === "DOCTOR") {
+                    window.location.href = "doctor.html";
+                } else {
+                    window.location.href = "user.html";
+                }
+            } catch (e) {
+                errorMsg.innerText = "用户名或密码错误";
+                errorMsg.classList.remove("hidden");
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>立即登录</span><i class="fa-solid fa-arrow-right text-xs opacity-90"></i>';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const regErrorMsg = document.getElementById("regErrorMsg");
+            const regOkMsg = document.getElementById("regOkMsg");
+            const registerBtn = document.getElementById("registerBtn");
+            const role = document.getElementById("regRole").value;
+
+            regErrorMsg.classList.add("hidden");
+            regOkMsg.classList.add("hidden");
+
+            if (role !== "USER") {
+                regErrorMsg.innerText = "权限不足：无法注册医生或管理员账号";
+                regErrorMsg.classList.remove("hidden");
+                return;
+            }
+
+            const name = document.getElementById("regName").value.trim();
+            const username = document.getElementById("regUsername").value.trim();
+            const password = document.getElementById("regPassword").value;
+            const password2 = document.getElementById("regPassword2").value;
+            const phone = document.getElementById("regPhone").value.trim();
+            const email = document.getElementById("regEmail").value.trim();
+
+            if (password.length < 6) {
+                regErrorMsg.innerText = "密码长度至少 6 位";
+                regErrorMsg.classList.remove("hidden");
+                return;
+            }
+            if (password !== password2) {
+                regErrorMsg.innerText = "两次输入的密码不一致";
+                regErrorMsg.classList.remove("hidden");
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i><span>提交中...</span>';
+
+            try {
+                await common.fetch("/api/users/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name,
+                        username,
+                        password,
+                        role: "USER",
+                        phone: phone || null,
+                        email: email || null
+                    })
+                });
+                regOkMsg.innerText = "注册成功！请切换到「登录」使用新账号登录。";
+                regOkMsg.classList.remove("hidden");
+                document.getElementById("regPassword").value = "";
+                document.getElementById("regPassword2").value = "";
+            } catch (e) {
+                const msg = (e && e.message) ? e.message.replace(/^"|"$/g, "") : "注册失败";
+                if (msg.includes("权限不足") || msg === "权限不足") {
+                    regErrorMsg.innerText = "权限不足：无法注册该角色";
+                } else {
+                    regErrorMsg.innerText = msg;
+                }
+                regErrorMsg.classList.remove("hidden");
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i><span>创建患者账号</span>';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = common.getLoggedInUser();
+            if (user) {
+                if (user.role === "ADMIN") window.location.href = "admin.html";
+                else if (user.role === "DOCTOR") window.location.href = "doctor.html";
+                else window.location.href = "user.html";
+            }
+        });
+    </script>
+</body>
+</html>

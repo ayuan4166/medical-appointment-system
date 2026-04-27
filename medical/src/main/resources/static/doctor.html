@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗预约系统 - 医生端</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell min-h-screen">
+
+    <nav class="app-nav-blur px-4 py-2.5 fixed w-full z-50">
+        <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+            <div class="flex items-center">
+                <i class="fa-solid fa-stethoscope text-blue-600 text-2xl mr-3"></i>
+                <span class="self-center text-xl font-semibold whitespace-nowrap tracking-tight text-slate-800">医院预约系统 · 医生工作台</span>
+            </div>
+            <div class="flex items-center lg:order-2">
+                <span id="doctorName" class="text-gray-700 mr-4 font-medium"></span>
+                <button onclick="common.logout()" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none transition-colors">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i>退出登录
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-10 px-4 max-w-screen-xl mx-auto">
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="page-card rounded-xl p-6 border-l-4 border-blue-500">
+                <div class="text-xs font-bold text-blue-500 uppercase mb-1">今日待诊</div>
+                <div id="pendingCount" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="page-card rounded-xl p-6 border-l-4 border-green-500">
+                <div class="text-xs font-bold text-green-500 uppercase mb-1">已确认</div>
+                <div id="confirmedCount" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="page-card rounded-xl p-6 border-l-4 border-purple-500">
+                <div class="text-xs font-bold text-purple-500 uppercase mb-1">累计完成</div>
+                <div id="completedCount" class="text-2xl font-bold text-gray-800">0</div>
+            </div>
+            <div class="page-card rounded-xl p-6 border-l-4 border-slate-400">
+                <div class="text-xs font-bold text-slate-500 uppercase mb-1">个人信息</div>
+                <div id="doctorSpec" class="text-sm font-medium text-gray-600">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 预约管理 -->
+        <div class="page-card rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                    <i class="fa-solid fa-calendar-check text-blue-500 mr-2"></i>预约管理列表
+                </h2>
+                <div class="flex gap-2">
+                    <select id="statusFilter" onchange="loadAppointments()" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
+                        <option value="">全部状态</option>
+                        <option value="PENDING">待处理</option>
+                        <option value="CONFIRMED">已确认</option>
+                        <option value="COMPLETED">已完成</option>
+                        <option value="CANCELLED">已取消</option>
+                    </select>
+                    <button onclick="loadAppointments()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i>刷新
+                    </button>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4">患者信息</th>
+                            <th class="px-6 py-4">预约时间</th>
+                            <th class="px-6 py-4">备注/病史</th>
+                            <th class="px-6 py-4">当前状态</th>
+                            <th class="px-6 py-4">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentTableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="noData" class="hidden p-10 text-center text-gray-400">
+                <i class="fa-regular fa-calendar-xmark text-4xl mb-3"></i>
+                <p>暂无相关预约记录</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        let currentUser = null;
+        let doctorInfo = null;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            currentUser = common.checkLogin("DOCTOR");
+            if (!currentUser) return;
+
+            try {
+                doctorInfo = await common.fetch(`/api/doctors/user/${currentUser.id}`);
+                if (!doctorInfo) {
+                    common.showMessage("error", "未能关联到医生信息，请联系管理员");
+                    return;
+                }
+                
+                document.getElementById("doctorName").textContent = `医生：${doctorInfo.name}`;
+                document.getElementById("doctorSpec").textContent = `${doctorInfo.department?.name || '未知科室'} · ${doctorInfo.specialization || '全科'}`;
+                
+                await loadAppointments();
+            } catch (e) {
+                console.error("加载信息失败", e);
+            }
+        });
+
+        async function loadAppointments() {
+            const tbody = document.getElementById("appointmentTableBody");
+            const noData = document.getElementById("noData");
+            const filter = document.getElementById("statusFilter").value;
+            
+            try {
+                let data = await common.fetch(`/api/appointments?doctorId=${doctorInfo.id}`);
+                
+                if (filter) {
+                    data = data.filter(a => a.status === filter);
+                }
+
+                // Update stats
+                document.getElementById("pendingCount").textContent = data.filter(a => a.status === 'PENDING').length;
+                document.getElementById("confirmedCount").textContent = data.filter(a => a.status === 'CONFIRMED').length;
+                document.getElementById("completedCount").textContent = data.filter(a => a.status === 'COMPLETED').length;
+
+                tbody.innerHTML = "";
+                
+                if (!data || data.length === 0) {
+                    noData.classList.remove("hidden");
+                    return;
+                }
+                
+                noData.classList.add("hidden");
+                data.sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
+
+                data.forEach(a => {
+                    const statusClass = `status-${a.status}`;
+                    const statusText = {
+                        'PENDING': '待确认',
+                        'CONFIRMED': '已确认',
+                        'CANCELLED': '已取消',
+                        'COMPLETED': '已完成'
+                    }[a.status] || a.status;
+
+                    const row = document.createElement("tr");
+                    row.className = "bg-white border-b hover:bg-gray-50 transition-colors";
+                    
+                    let actionButtons = "";
+                    if (a.status === 'PENDING') {
+                        actionButtons = `
+                            <button onclick="updateStatus(${a.id}, 'CONFIRMED')" class="text-green-600 hover:text-green-800 font-medium mr-3">确认</button>
+                            <button onclick="updateStatus(${a.id}, 'CANCELLED')" class="text-red-600 hover:text-red-800 font-medium">拒绝</button>
+                        `;
+                    } else if (a.status === 'CONFIRMED') {
+                        actionButtons = `
+                            <button onclick="updateStatus(${a.id}, 'COMPLETED')" class="text-blue-600 hover:text-blue-800 font-medium">完成就诊</button>
+                        `;
+                    } else {
+                        actionButtons = '<span class="text-gray-300">—</span>';
+                    }
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-medium text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold">${a.user?.name || a.user?.username || '匿名患者'}</div>
+                                    <div class="text-xs text-gray-400">${a.user?.phone || '无电话'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">
+                            ${common.formatDateTime(a.appointmentDateTime)}
+                        </td>
+                        <td class="px-6 py-4 max-w-xs truncate" title="${a.note || ''}">
+                            ${a.note || '<span class="text-gray-300">无备注</span>'}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${actionButtons}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                common.showMessage("error", "加载预约失败");
+            }
+        }
+
+        async function updateStatus(id, status) {
+            const confirmMsg = {
+                'CONFIRMED': '确定确认该预约吗？',
+                'CANCELLED': '确定拒绝该预约吗？',
+                'COMPLETED': '确定已完成就诊吗？'
+            }[status];
+
+            if (!confirm(confirmMsg)) return;
+            
+            try {
+                await common.fetch(`/api/appointments/${id}/status?status=${status}`, {
+                    method: "PUT"
+                });
+                common.showMessage("success", "状态更新成功");
+                loadAppointments();
+            } catch (e) {
+                common.showMessage("error", "操作失败");
+            }
+        }
+    </script>
+</body>
+</html>

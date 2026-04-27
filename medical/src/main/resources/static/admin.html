@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗预约系统 - 管理后台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .sidebar { width: 260px; }
+        .main-content { margin-left: 260px; }
+        .search-input {
+            width: 240px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="app-shell bg-slate-100 min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed top-0 left-0 h-full bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white z-50 transition-all duration-300 shadow-xl shadow-slate-900/20">
+        <div class="p-6 flex items-center mb-6">
+            <i class="fa-solid fa-shield-halved text-blue-400 text-2xl mr-3"></i>
+            <span class="text-xl font-bold tracking-wider">管理系统</span>
+        </div>
+        
+        <nav class="px-4 space-y-2">
+            <a href="#" onclick="showSection('dashboard')" class="sidebar-link active" id="link-dashboard">
+                <i class="fa-solid fa-chart-line"></i>控制台
+            </a>
+            <a href="#" onclick="showSection('departments')" class="sidebar-link" id="link-departments">
+                <i class="fa-solid fa-sitemap"></i>科室管理
+            </a>
+            <a href="#" onclick="showSection('doctors')" class="sidebar-link" id="link-doctors">
+                <i class="fa-solid fa-user-md"></i>医生管理
+            </a>
+            <a href="#" onclick="showSection('appointments')" class="sidebar-link" id="link-appointments">
+                <i class="fa-solid fa-calendar-check"></i>预约管理
+            </a>
+            <a href="#" onclick="showSection('users')" class="sidebar-link" id="link-users">
+                <i class="fa-solid fa-users"></i>用户管理
+            </a>
+            <div class="pt-10">
+                <a href="#" onclick="common.logout()" class="sidebar-link text-red-400 hover:text-red-300">
+                    <i class="fa-solid fa-power-off"></i>退出系统
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content min-h-screen p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 id="sectionTitle" class="text-2xl font-bold text-gray-800">控制台概览</h1>
+                <p class="text-gray-500 text-sm">欢迎回来，系统管理员</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="adminName" class="font-medium text-gray-700"></span>
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">A</div>
+            </div>
+        </header>
+
+        <!-- Sections -->
+        
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="section-content">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 text-sm font-medium">医生总数</div>
+                    <div id="stat-doctors" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 text-sm font-medium">预约总量</div>
+                    <div id="stat-appointments" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 text-sm font-medium">注册用户</div>
+                    <div id="stat-users" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 text-sm font-medium">科室数量</div>
+                    <div id="stat-departments" class="text-2xl font-bold text-gray-800">0</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6">预约状态分布</h3>
+                    <canvas id="statusChart" height="200"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6">系统通知</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                            <i class="fa-solid fa-circle-info text-blue-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm font-medium text-blue-900">系统运行正常</p>
+                                <p class="text-xs text-blue-700">所有服务模块当前响应时间低于 100ms。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generic Table Section Container -->
+        <div id="section-table" class="section-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 id="tableTitle" class="text-lg font-bold text-gray-800">管理列表</h2>
+                    <div class="flex items-center gap-3">
+                        <input id="searchInput" class="search-input hidden" type="text" placeholder="请输入关键词搜索">
+                        <button id="addBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fa-solid fa-plus mr-2"></i>新增
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead id="tableHead" class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <!-- Headers will be injected here -->
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal for adding/editing (Simplified) -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8">
+            <h3 id="modalTitle" class="text-xl font-bold mb-6">新增项</h3>
+            <div id="modalContent" class="space-y-4">
+                <!-- Dynamic form fields -->
+            </div>
+            <div class="mt-8 flex justify-end space-x-3">
+                <button onclick="closeModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">取消</button>
+                <button id="modalSaveBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        let currentUser = null;
+        let currentSection = 'dashboard';
+        let charts = {};
+        const APPOINTMENT_STATUS_TEXT = {
+            PENDING: '待确认',
+            CONFIRMED: '已确认',
+            COMPLETED: '已完成',
+            CANCELLED: '已取消'
+        };
+        const tableRawData = {
+            departments: [],
+            doctors: [],
+            appointments: [],
+            users: []
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            currentUser = common.checkLogin("ADMIN");
+            if (!currentUser) return;
+            document.getElementById("adminName").textContent = currentUser.name || currentUser.username;
+            showSection('dashboard');
+        });
+
+        function showSection(section) {
+            currentSection = section;
+            
+            // Update sidebar UI
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.id === `link-${section}`) link.classList.add('active');
+            });
+
+            // Update title
+            const titles = {
+                dashboard: '控制台概览',
+                departments: '科室管理',
+                doctors: '医生管理',
+                appointments: '预约管理',
+                users: '用户管理'
+            };
+            document.getElementById("sectionTitle").textContent = titles[section];
+
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+
+            if (section === 'dashboard') {
+                document.getElementById('section-dashboard').classList.remove('hidden');
+                loadDashboardData();
+            } else {
+                document.getElementById('section-table').classList.remove('hidden');
+                loadTableData(section);
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const [doctors, appointments, users, departments] = await Promise.all([
+                    common.fetch('/api/doctors'),
+                    common.fetch('/api/appointments'),
+                    common.fetch('/api/users'),
+                    common.fetch('/api/departments')
+                ]);
+
+                document.getElementById('stat-doctors').textContent = doctors.length;
+                document.getElementById('stat-appointments').textContent = appointments.length;
+                document.getElementById('stat-users').textContent = users.length;
+                document.getElementById('stat-departments').textContent = departments.length;
+
+                // Update Chart
+                const statusCounts = {
+                    PENDING: appointments.filter(a => a.status === 'PENDING').length,
+                    CONFIRMED: appointments.filter(a => a.status === 'CONFIRMED').length,
+                    COMPLETED: appointments.filter(a => a.status === 'COMPLETED').length,
+                    CANCELLED: appointments.filter(a => a.status === 'CANCELLED').length
+                };
+
+                const ctx = document.getElementById('statusChart').getContext('2d');
+                if (charts.status) charts.status.destroy();
+                charts.status = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['待确认', '已确认', '已完成', '已取消'],
+                        datasets: [{
+                            data: [statusCounts.PENDING, statusCounts.CONFIRMED, statusCounts.COMPLETED, statusCounts.CANCELLED],
+                            backgroundColor: ['#f59e0b', '#10b981', '#3b82f6', '#ef4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } },
+                        cutout: '70%'
+                    }
+                });
+            } catch (e) {
+                console.error("加载看板数据失败", e);
+            }
+        }
+
+        async function loadTableData(section) {
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            const addBtn = document.getElementById('addBtn');
+            const tableTitle = document.getElementById('tableTitle');
+            const searchInput = document.getElementById('searchInput');
+            
+            body.innerHTML = '<tr><td colspan="10" class="p-10 text-center">加载中...</td></tr>';
+            tableTitle.textContent = {
+                departments: '科室列表',
+                doctors: '医生列表',
+                appointments: '预约列表',
+                users: '用户列表'
+            }[section] || '管理列表';
+
+            try {
+                const data = await common.fetch(`/api/${section}`);
+                tableRawData[section] = data;
+                body.innerHTML = '';
+                searchInput.classList.remove('hidden');
+                searchInput.value = '';
+                searchInput.placeholder = {
+                    departments: '按科室ID或名称搜索',
+                    doctors: '按姓名、科室、专业搜索',
+                    appointments: '按患者、医生、状态搜索',
+                    users: '按用户名、姓名、角色搜索'
+                }[section] || '请输入关键词搜索';
+                searchInput.oninput = () => renderTable(section, searchInput.value.trim());
+
+                addBtn.classList.remove('hidden');
+
+                if (section === 'departments') {
+                    head.innerHTML = '<tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">科室名称</th><th class="px-6 py-4">操作</th></tr>';
+                    addBtn.onclick = () => openModal('新增科室', [{id:'name', label:'科室名称', type:'text'}], (vals) => saveItem('departments', vals));
+                } 
+                else if (section === 'doctors') {
+                    head.innerHTML = '<tr><th class="px-6 py-4">姓名</th><th class="px-6 py-4">科室</th><th class="px-6 py-4">专业</th><th class="px-6 py-4">预约上限/日</th><th class="px-6 py-4">操作</th></tr>';
+                    const depts = await common.fetch('/api/departments');
+                    const users = (await common.fetch('/api/users')).filter(u => u.role === 'DOCTOR');
+                    addBtn.onclick = () => openModal('新增医生', [
+                        {id:'name', label:'医生姓名', type:'text'},
+                        {id:'userId', label:'关联用户', type:'select', options: users.map(u => ({val: u.id, text: u.username}))},
+                        {id:'departmentId', label:'所属科室', type:'select', options: depts.map(d => ({val: d.id, text: d.name}))},
+                        {id:'specialization', label:'专业领域', type:'text'},
+                        {id:'phone', label:'联系电话', type:'text'},
+                        {id:'dailyAppointmentLimit', label:'每日预约上限', type:'number'}
+                    ], (vals) => {
+                        const payload = {
+                            name: vals.name,
+                            userId: parseInt(vals.userId),
+                            specialization: vals.specialization,
+                            phone: vals.phone,
+                            dailyAppointmentLimit: parseInt(vals.dailyAppointmentLimit) || 20,
+                            department: { id: parseInt(vals.departmentId) }
+                        };
+                        saveItem('doctors', payload);
+                    });
+                }
+                else if (section === 'appointments') {
+                    head.innerHTML = '<tr><th class="px-6 py-4">患者</th><th class="px-6 py-4">医生</th><th class="px-6 py-4">时间</th><th class="px-6 py-4">状态</th><th class="px-6 py-4">操作</th></tr>';
+                    addBtn.classList.add('hidden'); // Admin usually doesn't create appointments manually
+                }
+                else if (section === 'users') {
+                    head.innerHTML = '<tr><th class="px-6 py-4">用户名</th><th class="px-6 py-4">姓名</th><th class="px-6 py-4">角色</th><th class="px-6 py-4">操作</th></tr>';
+                    addBtn.onclick = () => openModal('新增用户', [
+                        {id:'username', label:'用户名', type:'text'},
+                        {id:'password', label:'密码', type:'password'},
+                        {id:'name', label:'姓名', type:'text'},
+                        {id:'role', label:'角色', type:'select', options: [{val:'USER', text:'普通用户'}, {val:'DOCTOR', text:'医生'}, {val:'ADMIN', text:'管理员'}]}
+                    ], (vals) => saveItem('users', vals));
+                }
+
+                renderTable(section, '');
+            } catch (e) {
+                body.innerHTML = '<tr><td colspan="10" class="p-10 text-center text-red-500">加载失败</td></tr>';
+            }
+        }
+
+        function renderTable(section, keyword) {
+            const body = document.getElementById('tableBody');
+            const query = (keyword || '').toLowerCase();
+            const data = (tableRawData[section] || []).filter(item => matchesSearch(section, item, query));
+
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="10" class="p-10 text-center text-gray-500">未找到匹配数据</td></tr>';
+                return;
+            }
+
+            body.innerHTML = '';
+            if (section === 'departments') {
+                data.forEach(d => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    tr.innerHTML = `<td class="px-6 py-4">${d.id}</td><td class="px-6 py-4 font-bold">${d.name}</td>
+                        <td class="px-6 py-4 space-x-3">
+                            <button onclick="editDepartment(${d.id})" class="text-blue-600 hover:underline">编辑</button>
+                            <button onclick="deleteItem('departments', ${d.id})" class="text-red-600 hover:underline">删除</button>
+                        </td>`;
+                    body.appendChild(tr);
+                });
+            } else if (section === 'doctors') {
+                data.forEach(d => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    tr.innerHTML = `<td class="px-6 py-4 font-bold">${d.name}</td><td class="px-6 py-4">${d.department?.name || '—'}</td>
+                        <td class="px-6 py-4">${d.specialization || '—'}</td>
+                        <td class="px-6 py-4">${d.dailyAppointmentLimit || 20}</td>
+                        <td class="px-6 py-4 space-x-3">
+                            <button onclick="editDoctor(${d.id})" class="text-blue-600 hover:underline">编辑</button>
+                            <button onclick="deleteItem('doctors', ${d.id})" class="text-red-600 hover:underline">删除</button>
+                        </td>`;
+                    body.appendChild(tr);
+                });
+            } else if (section === 'appointments') {
+                data.forEach(a => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    tr.innerHTML = `<td class="px-6 py-4">${a.user?.name || a.user?.username}</td><td class="px-6 py-4">${a.doctor?.name}</td>
+                        <td class="px-6 py-4">${common.formatDateTime(a.appointmentDateTime)}</td>
+                        <td class="px-6 py-4"><span class="status-badge status-${a.status}">${APPOINTMENT_STATUS_TEXT[a.status] || a.status}</span></td>
+                        <td class="px-6 py-4"><button onclick="deleteItem('appointments', ${a.id})" class="text-red-600 hover:underline">删除</button></td>`;
+                    body.appendChild(tr);
+                });
+            } else if (section === 'users') {
+                data.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    tr.innerHTML = `<td class="px-6 py-4 font-bold">${u.username}</td><td class="px-6 py-4">${u.name}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 bg-gray-100 rounded text-xs">${u.role}</span></td>
+                        <td class="px-6 py-4 space-x-3">
+                            <button onclick="editUser(${u.id})" class="text-blue-600 hover:underline">编辑</button>
+                            <button onclick="deleteItem('users', ${u.id})" class="text-red-600 hover:underline">删除</button>
+                        </td>`;
+                    body.appendChild(tr);
+                });
+            }
+        }
+
+        function matchesSearch(section, item, query) {
+            if (!query) return true;
+            if (section === 'departments') {
+                return `${item.id}`.includes(query) || (item.name || '').toLowerCase().includes(query);
+            }
+            if (section === 'doctors') {
+                return (item.name || '').toLowerCase().includes(query)
+                    || (item.department?.name || '').toLowerCase().includes(query)
+                    || (item.specialization || '').toLowerCase().includes(query);
+            }
+            if (section === 'appointments') {
+                return (item.user?.name || item.user?.username || '').toLowerCase().includes(query)
+                    || (item.doctor?.name || '').toLowerCase().includes(query)
+                    || (item.status || '').toLowerCase().includes(query);
+            }
+            if (section === 'users') {
+                return (item.username || '').toLowerCase().includes(query)
+                    || (item.name || '').toLowerCase().includes(query)
+                    || (item.role || '').toLowerCase().includes(query);
+            }
+            return true;
+        }
+
+        async function editDepartment(id) {
+            const item = tableRawData.departments.find(d => d.id === id);
+            if (!item) return;
+            openModal(
+                '编辑科室',
+                [{id:'name', label:'科室名称', type:'text'}],
+                (vals) => updateItem('departments', id, vals),
+                { name: item.name || '' }
+            );
+        }
+
+        async function editDoctor(id) {
+            const item = tableRawData.doctors.find(d => d.id === id);
+            if (!item) return;
+            const depts = await common.fetch('/api/departments');
+            const users = (await common.fetch('/api/users')).filter(u => u.role === 'DOCTOR');
+            openModal(
+                '编辑医生',
+                [
+                    {id:'name', label:'医生姓名', type:'text'},
+                    {id:'userId', label:'关联用户', type:'select', options: users.map(u => ({val: u.id, text: u.username}))},
+                    {id:'departmentId', label:'所属科室', type:'select', options: depts.map(d => ({val: d.id, text: d.name}))},
+                    {id:'specialization', label:'专业领域', type:'text'},
+                    {id:'phone', label:'联系电话', type:'text'},
+                    {id:'dailyAppointmentLimit', label:'每日预约上限', type:'number'}
+                ],
+                (vals) => updateItem('doctors', id, {
+                    name: vals.name,
+                    userId: parseInt(vals.userId),
+                    specialization: vals.specialization,
+                    phone: vals.phone,
+                    dailyAppointmentLimit: parseInt(vals.dailyAppointmentLimit) || 20,
+                    department: { id: parseInt(vals.departmentId) }
+                }),
+                {
+                    name: item.name || '',
+                    userId: item.userId || '',
+                    departmentId: item.department?.id || '',
+                    specialization: item.specialization || '',
+                    phone: item.phone || '',
+                    dailyAppointmentLimit: item.dailyAppointmentLimit || 20
+                }
+            );
+        }
+
+        function editUser(id) {
+            const item = tableRawData.users.find(u => u.id === id);
+            if (!item) return;
+            openModal(
+                '编辑用户',
+                [
+                    {id:'username', label:'用户名', type:'text'},
+                    {id:'password', label:'新密码(留空不修改)', type:'password'},
+                    {id:'name', label:'姓名', type:'text'},
+                    {id:'role', label:'角色', type:'select', options: [{val:'USER', text:'普通用户'}, {val:'DOCTOR', text:'医生'}, {val:'ADMIN', text:'管理员'}]}
+                ],
+                (vals) => updateItem('users', id, vals),
+                {
+                    username: item.username || '',
+                    password: '',
+                    name: item.name || '',
+                    role: item.role || 'USER'
+                }
+            );
+        }
+
+        function openModal(title, fields, onSave, initialValues = {}) {
+            document.getElementById('modalTitle').textContent = title;
+            const content = document.getElementById('modalContent');
+            content.innerHTML = '';
+            
+            fields.forEach(f => {
+                const div = document.createElement('div');
+                div.innerHTML = `<label class="block text-sm font-medium text-gray-700 mb-1">${f.label}</label>`;
+                if (f.type === 'select') {
+                    const sel = document.createElement('select');
+                    sel.id = `field-${f.id}`;
+                    sel.className = 'block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm';
+                    f.options.forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o.val;
+                        opt.textContent = o.text;
+                        if (`${initialValues[f.id] ?? ''}` === `${o.val}`) {
+                            opt.selected = true;
+                        }
+                        sel.appendChild(opt);
+                    });
+                    div.appendChild(sel);
+                } else {
+                    div.innerHTML += `<input type="${f.type}" id="field-${f.id}" value="${initialValues[f.id] ?? ''}" class="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">`;
+                }
+                content.appendChild(div);
+            });
+
+            document.getElementById('modalSaveBtn').onclick = () => {
+                const values = {};
+                fields.forEach(f => {
+                    values[f.id] = document.getElementById(`field-${f.id}`).value;
+                });
+                onSave(values);
+            };
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        async function saveItem(endpoint, payload) {
+            try {
+                await common.fetch(`/api/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                closeModal();
+                loadTableData(endpoint);
+            } catch (e) {
+                alert("保存失败: " + e.message);
+            }
+        }
+
+        async function updateItem(endpoint, id, payload) {
+            try {
+                await common.fetch(`/api/${endpoint}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                closeModal();
+                loadTableData(endpoint);
+            } catch (e) {
+                alert("更新失败: " + e.message);
+            }
+        }
+
+        async function deleteItem(endpoint, id) {
+            if (!confirm("确定要删除吗？")) return;
+            try {
+                await common.fetch(`/api/${endpoint}/${id}`, { method: 'DELETE' });
+                loadTableData(endpoint);
+            } catch (e) {
+                alert("删除失败");
+            }
+        }
+    </script>
+</body>
+</html>
